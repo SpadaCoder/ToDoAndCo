@@ -29,6 +29,14 @@ class AppFixtures extends Fixture
         $anonymousUser->setPassword($this->passwordHasher->hashPassword($anonymousUser, 'password123'));
         $manager->persist($anonymousUser);
 
+        // Créer un utilisateur admin
+        $adminUser = new User();
+        $adminUser->setEmail('admin@example.com');
+        $adminUser->setUsername('admin');
+        $adminUser->setPassword($this->passwordHasher->hashPassword($adminUser, 'admin123'));
+        $adminUser->setRoles(['ROLE_ADMIN']); 
+        $manager->persist($adminUser);
+
         // Créer d'autres utilisateurs
         for ($i = 0; $i < 5; $i++) {
             $user = new User();
