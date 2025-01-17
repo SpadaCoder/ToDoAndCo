@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class UserController extends AbstractController
 {
@@ -32,6 +33,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/create', name: 'user_create')]
+    #[IsGranted('ROLE_ADMIN')]
     public function createAction(Request $request)
     {
         $user = new User();
@@ -56,6 +58,7 @@ class UserController extends AbstractController
 
 
     #[Route('/users/{id}/edit', name: 'user_edit')]
+    #[IsGranted('ROLE_ADMIN')]
     public function editAction(User $user, Request $request)
     {
         $form = $this->createForm(UserType::class, $user);
