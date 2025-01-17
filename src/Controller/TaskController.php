@@ -33,7 +33,7 @@ class TaskController extends AbstractController
     #[Route('/tasks/create', name: 'task_create')]
     public function createAction(Request $request)
     {
-        // Vérifier si l'utilisateur est connecté
+        // Vérifier si l'utilisateur est connecté.
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw new AccessDeniedException('Vous devez être connecté pour créer une tâche.');
         }
@@ -90,6 +90,29 @@ class TaskController extends AbstractController
     #[Route('/tasks/{id}/delete', name: 'task_delete')]
     public function deleteTaskAction(Task $task)
     {
+        // Vérifier si l'utilisateur est connecté.
+        if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw new AccessDeniedException('Vous devez être connecté pour créer une tâche.');
+        }
+
+        $user = $this->getUser();
+
+        // Vérifier si la tâche est associée à l'utilisateur "anonyme".
+        if ($task->getUser() && $task->getUser()->getUsername() === 'anonyme') {
+            // Si l'utilisateur est un administrateur, on lui permet de supprimer.
+            if (!$this->isGranted('ROLE_ADMIN')) {
+                $this->addFlash('error', 'Vous devez être administrateur pour supprimer cette tâche.');
+                return $this->redirectToRoute('task_list');
+            }
+        } else {
+            // Vérifier que l'utilisateur est le créateur de la tâche.
+            if ($task->getUser() !== $user) {
+                $this->addFlash('error', 'Vous ne pouvez supprimer que vos propres tâches.');
+                return $this->redirectToRoute('task_list');
+            }
+        }
+
+        // Si l'utilisateur a les droits, supprimer la tâche.
         $this->entityManager->remove($task);
         $this->entityManager->flush();
 
