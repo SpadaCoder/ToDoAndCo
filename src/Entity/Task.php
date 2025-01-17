@@ -89,6 +89,10 @@ class Task
 
     public function setUser(?User $user): static
     {
+        if ($this->user !== null) {
+            throw new \LogicException('L’utilisateur ne peut pas être modifié une fois défini.');
+        }
+        
         $this->user = $user;
 
         return $this;
