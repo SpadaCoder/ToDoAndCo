@@ -21,7 +21,7 @@ class UserController extends AbstractController
         $this->passwordHasher = $passwordHasher;
     }
 
-    #[Route('/users', name: 'user_list')]
+    #[Route('admin/users', name: 'user_list')]
     public function listAction()
     {
         $users = $this->entityManager->getRepository(User::class)->findAll();
