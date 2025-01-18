@@ -102,7 +102,7 @@ class TaskController extends AbstractController
     {
         // Vérifier si l'utilisateur est connecté.
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
-            throw new AccessDeniedException('Vous devez être connecté pour créer une tâche.');
+            throw new AccessDeniedException('Vous devez être connecté pour supprimer une tâche.');
         }
 
         $user = $this->getUser();
