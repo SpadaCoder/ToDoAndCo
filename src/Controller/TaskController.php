@@ -30,6 +30,16 @@ class TaskController extends AbstractController
         ]);
     }
 
+    #[Route('/tasks/completed', name: 'task_completed_list')]
+    public function listCompletedAction()
+    {
+        $tasks = $this->entityManager->getRepository(Task::class)->findBy(['isDone' => 1]);
+
+        return $this->render('task/list.html.twig', [
+            'tasks' => $tasks,
+        ]);
+    }
+
     #[Route('/tasks/create', name: 'task_create')]
     public function createAction(Request $request)
     {
