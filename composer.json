@@ -79,6 +79,8 @@
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.0",
         "fakerphp/faker": "^1.24",
-        "symfony/maker-bundle": "*"
+        "phpunit/phpunit": "^9",
+        "symfony/maker-bundle": "*",
+        "symfony/phpunit-bridge": "^7.2"
     }
 }
