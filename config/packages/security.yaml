@@ -16,7 +16,7 @@ security:
             lazy: true
             provider: app_user_provider
             form_login:
-                login_path: app_login
+                login_path: login
                 check_path: login_check
                 enable_csrf: true
                 default_target_path: homepage
@@ -37,7 +37,8 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN}
+        - { path: ^/admin, roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
