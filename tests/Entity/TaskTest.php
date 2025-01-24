@@ -153,4 +153,11 @@ class TaskEntityTest extends TestCase
         $this->assertSame($userMock, $this->task->getUser());
         $this->assertEquals('MockedUser', $this->task->getUser()->getUsername());
     }
+    // ------------------------------
+    // Nettoyage des données
+    // ------------------------------
+    public function tearDown(): void
+    {
+        $this->task = null;
+    }
 }
