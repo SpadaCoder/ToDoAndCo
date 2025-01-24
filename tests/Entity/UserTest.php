@@ -102,4 +102,11 @@ class UserEntityTest extends TestCase
         $this->assertSame('userTest', $this->user->getUsername());
     }
 
+    // ------------------------------
+    // Nettoyage des données
+    // ------------------------------
+    public function tearDown(): void
+    {
+        $this->user = null;
+    }
 }
