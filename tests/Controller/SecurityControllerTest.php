@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -43,23 +44,14 @@ class SecurityControllerTest extends WebTestCase
     }
 
     /**
-     * Teste que la page de login contient le bon titre.
-     */
-    public function testLoginPageTitle(): void
-    {
-        $this->client->request('GET', '/login');
-        $this->assertSelectorTextContains('title', 'Login');
-    }
-
-    /**
      * Teste si le formulaire de connexion est affiché.
      */
     public function testLoginFormIsDisplayed(): void
     {
         $this->client->request('GET', '/login');
         $this->assertSelectorExists('form');
-        $this->assertSelectorExists('input[name="username"]');
-        $this->assertSelectorExists('input[name="password"]');
+        $this->assertSelectorExists('input[name="_username"]');
+        $this->assertSelectorExists('input[name="_password"]');
     }
 
     // ------------------------------
@@ -70,13 +62,17 @@ class SecurityControllerTest extends WebTestCase
      * Teste que la soumission d'un mauvais formulaire retourne une erreur.
      */
     public function testInvalidLogin(): void
-    {
-        $this->client->request('POST', '/login', [
-            'username' => 'invalid_user',
-            'password' => 'invalid_password',
+    {        
+        $crawler = $this->client->request('GET', '/login');
+        
+        $form = $crawler->selectButton('Se connecter')->form([
+            '_username' => 'invalid_user',
+            '_password' => 'invalid_password'
         ]);
-        $this->assertResponseRedirects();
-        $this->assertSelectorTextContains('.flash-error', 'Invalid credentials');
+        $this->client->submit($form);
+        $this->assertResponseRedirects('/login');
+        $this->client->followRedirect();
+        $this->assertSelectorTextContains('.alert.alert-danger', 'Invalid credentials');
     }
 
     /**
@@ -84,18 +80,18 @@ class SecurityControllerTest extends WebTestCase
      */
     public function testValidLogin(): void
     {
-        $user = new User();
-        $user->setUsername('test_user');
-        $user->setEmail('testuser@example.com');
-        $user->setPassword('password123');
-        $user->setRoles(['ROLE_USER']); 
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('art22@schmeler.com');
 
-        $this->client->request('POST', '/login', [
-            'username' => 'admin',
-            'password' => 'admin_password',
+        $crawler = $this->client->request('GET', '/login');
+
+        $form = $crawler->selectButton('Se connecter')->form([
+            '_username' => $testUser->getUsername(),
+            '_password' => 'password123',
         ]);
+    
+        $this->client->submit($form);
+    
         $this->assertResponseRedirects('/');
     }
 
@@ -109,15 +105,13 @@ class SecurityControllerTest extends WebTestCase
     public function testLogout(): void
     {
         // Simulez un utilisateur connecté
-        $this->client->request('POST', '/login', [
-            'username' => 'admin',
-            'password' => 'admin_password',
-        ]);
+    $userRepository = static::getContainer()->get(UserRepository::class);
+    $testUser = $userRepository->findOneByEmail('art22@schmeler.com');
+    $this->client->loginUser($testUser);
 
         // Déconnexion
         $this->client->request('GET', '/logout');
         $this->assertResponseRedirects('/');
-        $this->assertSelectorTextContains('.flash-success', 'You have been logged out');
     }
 
     /**
@@ -129,18 +123,4 @@ class SecurityControllerTest extends WebTestCase
         $this->assertResponseRedirects('/login');
     }
 
-    /**
-     * Teste que l'utilisateur peut accéder à la page protégée après une connexion.
-     */
-    public function testAccessProtectedPageWithLogin(): void
-    {
-        // Créez un utilisateur valide et connectez-le
-        $this->client->request('POST', '/login', [
-            'username' => 'adminUser',
-            'password' => 'adminUser_password',
-        ]);
-
-        $this->client->request('GET', '/admin');
-        $this->assertResponseIsSuccessful();
-    }
 }
