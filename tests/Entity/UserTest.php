@@ -4,6 +4,7 @@ namespace App\tests\Entity;
 
 use PHPUnit\Framework\TestCase;
 use App\Entity\User;
+use App\Entity\Task;
 
 class UserEntityTest extends TestCase
 {
@@ -100,6 +101,59 @@ class UserEntityTest extends TestCase
     {
         $this->user->setUsername('userTest');
         $this->assertSame('userTest', $this->user->getUsername());
+    }
+
+    // ------------------------------
+    // Tests sur les propriétés complexes
+    // ------------------------------
+
+    /**
+     * Test de l'ajout d'une tâche à un utilisateur.
+     */
+    public function testAddTask()
+    {
+        $user = new User();
+        $task = new Task();
+
+        $user->addTask($task);
+        $this->assertCount(1, $user->getTasks());
+        $this->assertTrue($user->getTasks()->contains($task));
+        $this->assertSame($user, $task->getUser());
+    }
+
+    /**
+     * Test de la suppression d'une tâche d'un utilisateur.
+     */
+    public function testRemoveTask()
+    {
+            $user = new User();
+            $task = new Task();
+        
+            // Ajout d'une tâche à la collection de l'utilisateur
+            $user->addTask($task);
+        
+            // Vérification que la tâche a bien été ajoutée
+            static::assertCount(1, $user->getTasks());
+        
+            // Suppression de la tâche
+            $user->removeTask($task);
+        
+            // Vérification que la collection est maintenant vide
+            static::assertEmpty($user->getTasks());
+    }
+
+    /**
+     * Test de la suppression d'une tâche qui n'existe pas dans la collection d'un utilisateur.
+     */
+    public function testRemoveTaskWhenTaskNotInCollection()
+    {
+        $user = new User();
+
+        // Tentative de suppression d'une tâche qui n'est pas dans la collection
+        $task = new Task();
+        static::assertInstanceOf(User::class, $user->removeTask($task));
+
+        static::assertEmpty($user->getTasks());
     }
 
     // ------------------------------

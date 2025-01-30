@@ -84,6 +84,23 @@ class TaskEntityTest extends TestCase
         $this->assertInstanceOf(User::class, $this->task->getUser());
     }
 
+    /**
+     * Test que l'utilisateur ne peut pas être modifié une fois défini sur une tâche.
+     */
+    public function testSetUserOnTaskOnceDefined()
+    {
+        $user1 = new User();
+        $user2 = new User();
+        $task = new Task();
+        
+        $task->setUser($user1);
+        $this->assertSame($user1, $task->getUser());
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('L’utilisateur ne peut pas être modifié une fois défini.');
+        $task->setUser($user2);
+    }
+
     // ------------------------------
     // Tests avancés avec data providers
     // ------------------------------
