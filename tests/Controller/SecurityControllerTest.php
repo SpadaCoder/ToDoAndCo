@@ -11,7 +11,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class SecurityControllerTest extends WebTestCase
 {
     private $client;
-    private EntityManagerInterface $entityManager;
 
     /**
      * Initialisation d'une instance du client avant chaque test.

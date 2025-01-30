@@ -12,24 +12,44 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class TaskController extends AbstractController
 {
+
+    /**
+     * Gestionnaire d'entités pour l'accès à la base de données.
+     *
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
 
-    // Injection de l'EntityManager via le constructeur
+    /**
+     * Constructeur du contrôleur.
+     *
+     * @param EntityManagerInterface $entityManager Le gestionnaire d'entités.
+     */
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
+
     }
 
+
+    /**
+     * Affiche la liste de toutes les tâches.
+     *
+     * @return Response La page affichant la liste des tâches.
+     */
     #[Route('/tasks', name: 'task_list')]
     public function listAction()
     {
         $tasks = $this->entityManager->getRepository(Task::class)->findAll();
 
-        return $this->render('task/list.html.twig', [
-            'tasks' => $tasks,
-        ]);
+        return $this->render('task/list.html.twig', compact('tasks'));
     }
 
+    /**
+     * Affiche la liste des tâches complétées.
+     *
+     * @return Response La page affichant les tâches complétées.
+     */
     #[Route('/tasks/completed', name: 'task_completed_list')]
     public function listCompletedAction()
     {
@@ -40,6 +60,12 @@ class TaskController extends AbstractController
         ]);
     }
 
+    /**
+     * Permet de créer une nouvelle tâche.
+     *
+     * @param Request $request La requête HTTP contenant les données du formulaire.
+     * @return Response La page affichant le formulaire de création.
+     */
     #[Route('/tasks/create', name: 'task_create')]
     public function createAction(Request $request)
     {
@@ -47,6 +73,7 @@ class TaskController extends AbstractController
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
             throw new AccessDeniedException('Vous devez être connecté pour créer une tâche.');
         }
+
         $task = new Task();
         $form = $this->createForm(TaskType::class, $task);
 
@@ -65,6 +92,13 @@ class TaskController extends AbstractController
         return $this->render('task/create.html.twig', ['form' => $form->createView()]);
     }
 
+    /**
+     * Permet de modifier une tâche existante.
+     *
+     * @param Task $task La tâche à modifier.
+     * @param Request $request La requête contenant les modifications.
+     * @return Response La page du formulaire de modification.
+     */
     #[Route('/tasks/{id}/edit', name: 'task_edit')]
     public function editAction(Task $task, Request $request)
     {
@@ -80,12 +114,21 @@ class TaskController extends AbstractController
             return $this->redirectToRoute('task_list');
         }
 
-        return $this->render('task/edit.html.twig', [
-            'form' => $form->createView(),
-            'task' => $task,
-        ]);
+        return $this->render(
+            'task/edit.html.twig',
+            [
+                'form' => $form->createView(),
+                'task' => $task,
+            ]
+        );
     }
 
+    /**
+     * Bascule l'état de complétion d'une tâche.
+     *
+     * @param Task $task La tâche à modifier.
+     * @return Response Redirige vers la liste des tâches après modification.
+     */
     #[Route('/tasks/{id}/toggle', name: 'task_toggle')]
     public function toggleTaskAction(Task $task)
     {
@@ -97,6 +140,12 @@ class TaskController extends AbstractController
         return $this->redirectToRoute('task_list');
     }
 
+    /**
+     * Supprime une tâche si l'utilisateur a les droits nécessaires.
+     *
+     * @param Task $task La tâche à supprimer.
+     * @return Response Redirige vers la liste des tâches après suppression.
+     */
     #[Route('/tasks/{id}/delete', name: 'task_delete')]
     public function deleteTaskAction(Task $task)
     {
