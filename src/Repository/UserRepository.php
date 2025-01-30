@@ -8,11 +8,15 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class UserRepository extends ServiceEntityRepository
 {
+
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
+
     }
 
+    
     public function findOneByEmail(string $email): ?User
     {
         return $this->findOneBy(['email' => $email]);
