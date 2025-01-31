@@ -38,7 +38,7 @@ class TaskController extends AbstractController
      * @return Response La page affichant la liste des tâches.
      */
     #[Route('/tasks', name: 'task_list')]
-    public function listAction()
+    public function list()
     {
         $tasks = $this->entityManager->getRepository(Task::class)->findAll();
 
@@ -51,7 +51,7 @@ class TaskController extends AbstractController
      * @return Response La page affichant les tâches complétées.
      */
     #[Route('/tasks/completed', name: 'task_completed_list')]
-    public function listCompletedAction()
+    public function listCompleted()
     {
         $tasks = $this->entityManager->getRepository(Task::class)->findBy(['isDone' => 1]);
 
@@ -67,7 +67,7 @@ class TaskController extends AbstractController
      * @return Response La page affichant le formulaire de création.
      */
     #[Route('/tasks/create', name: 'task_create')]
-    public function createAction(Request $request)
+    public function create(Request $request)
     {
         // Vérifier si l'utilisateur est connecté.
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
@@ -100,7 +100,7 @@ class TaskController extends AbstractController
      * @return Response La page du formulaire de modification.
      */
     #[Route('/tasks/{id}/edit', name: 'task_edit')]
-    public function editAction(Task $task, Request $request)
+    public function edit(Task $task, Request $request)
     {
         $form = $this->createForm(TaskType::class, $task);
 
@@ -130,7 +130,7 @@ class TaskController extends AbstractController
      * @return Response Redirige vers la liste des tâches après modification.
      */
     #[Route('/tasks/{id}/toggle', name: 'task_toggle')]
-    public function toggleTaskAction(Task $task)
+    public function toggleTask(Task $task)
     {
         $task->toggle(!$task->isDone());
         $this->entityManager->flush();
@@ -147,7 +147,7 @@ class TaskController extends AbstractController
      * @return Response Redirige vers la liste des tâches après suppression.
      */
     #[Route('/tasks/{id}/delete', name: 'task_delete')]
-    public function deleteTaskAction(Task $task)
+    public function deleteTask(Task $task)
     {
         // Vérifier si l'utilisateur est connecté.
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {

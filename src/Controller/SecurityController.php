@@ -18,7 +18,7 @@ class SecurityController extends AbstractController
      * @return Response La réponse HTTP contenant la page de connexion
      */
     #[Route('/login', name: 'login')]
-    public function loginAction(AuthenticationUtils $authenticationUtils): Response
+    public function login(AuthenticationUtils $authenticationUtils): Response
     {
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
